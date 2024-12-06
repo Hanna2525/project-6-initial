@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class AggregatorService {
@@ -49,4 +51,63 @@ public class AggregatorService {
         return common;
     }
 
+
+    //Extra Credit
+    // New method to get all palindromes
+    public List<Entry> getAllPalindromes() {
+        final List<Entry> candidates = new ArrayList<>();
+
+        // Iterate from 'a' to 'z'
+        for (char c = 'a'; c <= 'z'; c++) {
+            String character = String.valueOf(c);
+
+            // Get words starting and ending with the character
+            List<Entry> startsWith = aggregatorRestClient.getWordsStartingWith(character);
+            List<Entry> endsWith = aggregatorRestClient.getWordsEndingWith(character);
+
+            // Keep entries that exist in both lists (words that start and end with the same letter)
+            List<Entry> startsAndEndsWith = new ArrayList<>();
+            for (Entry startEntry : startsWith) {
+                for (Entry endEntry : endsWith) {
+                    if (startEntry.getWord().equals(endEntry.getWord())) {
+                        startsAndEndsWith.add(startEntry);
+                        break; // No need to continue searching once we find a match
+                    }
+                }
+            }
+
+            // Add valid words to the candidates list
+            candidates.addAll(startsAndEndsWith);
+        }
+
+        // Now filter out the palindromes
+        List<Entry> palindromes = new ArrayList<>();
+        for (Entry entry : candidates) {
+            String word = entry.getWord();
+            if (isPalindrome(word)) {
+                palindromes.add(entry);
+            }
+        }
+
+        // Sort the palindrome entries alphabetically
+        palindromes.sort((entry1, entry2) -> entry1.getWord().compareTo(entry2.getWord()));
+
+        return palindromes;
+    }
+
+    // Helper method to check if a word is a palindrome
+    private boolean isPalindrome(String word) {
+        int left = 0;
+        int right = word.length() - 1;
+
+        while (left < right) {
+            if (word.charAt(left) != word.charAt(right)) {
+                return false; // Not a palindrome
+            }
+            left++;
+            right--;
+        }
+
+        return true; // Word is a palindrome
+    }
 }

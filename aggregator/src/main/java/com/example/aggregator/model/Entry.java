@@ -8,6 +8,8 @@ public class Entry implements Comparable<Entry> {
     private String definition;
 
     public Entry() {
+        this.word = "Doh!";
+        this.definition = "A deer, a female deer! [No definition found!]";
     }
 
     public Entry(String word, String definition) {
